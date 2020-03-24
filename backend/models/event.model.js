@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 
 const eventSchema = new Schema({
       editKey: {type:Number},
+      calendar: {type:String,required:true},
       name: {type:String,required:true},
       venue: {type:String,required:true},
       startDate: {type:String,required:true},

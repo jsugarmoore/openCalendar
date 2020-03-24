@@ -8,12 +8,13 @@ router.route('/').get((req, res) => {
 })
 
 router.route('/add').post((req,res) => {
-    const editKey = req.body.editKey
+    const editKey = req.body.editKey;
+    const calendar = req.body.calendar;
     const name = req.body.name;
     const venue = req.body.venue;
     const startDate = req.body.startDate;
     const startTime = req.body.startTime;
-    const endDate = req.body.endDate;     //date.parse????
+    const endDate = req.body.endDate;
     const endTime = req.body.endTime;
     const description = req.body.description;
     const ageRestriction = req.body.ageRestriction;
@@ -22,6 +23,7 @@ router.route('/add').post((req,res) => {
 
     const newEvent = new Event({
       editKey,
+      calendar,
       name,
       venue,
       startDate,
@@ -55,11 +57,12 @@ router.route('/update/:id').post((req,res) => {
     Event.findById(req.params.id)
         .then(event => {
             event.editKey = req.body.editKey;
+            event.calendar = req.body.calendar;
             event.name = req.body.name;
             event.venue = req.body.venue;
             event.startDate = req.body.startDate;
             event.startTime = req.body.startTime;
-            event.endDate = req.body.endDate; //date.parse????
+            event.endDate = req.body.endDate; 
             event.endTime = req.body.endTime;
             event.description = req.body.description;
             event.ageRestriction = req.body.ageRestriction;

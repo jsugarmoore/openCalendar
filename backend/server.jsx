@@ -27,6 +27,9 @@ connection.once('open', () => {
 const eventsRouter = require('./routes/events');
 app.use('/events',eventsRouter);
 
+const calendarsRouter = require('./routes/calendars');
+app.use('/calendars',calendarsRouter);
+
 app.listen(port, () => {
     console.log('Server is running on port:' + port);
 })

@@ -1,15 +1,26 @@
-import React, {useState} from "react";
-import { createEvent, getEvents } from '../store/actions/eventActions';
+import React, {useState,useEffect} from "react";
+import { createEvent } from '../store/actions/eventActions';
+import { getCalendars} from '../store/actions/calendarActions';
 import { connect } from 'react-redux';
+import { Link } from "react-router-dom";
 
-function Form(props) {
+function Submit(props) {
 
-  if (props.eventInfo.length === 0) {
-    props.getEvents();
-  }
+const calURL = props.match.params.calURL;
+
+  useEffect(() => {
+    if (props.calendarInfo.length === 0) {
+      props.getCalendars();
+    }
+  }, [props]);
+
+
+
+const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
 
     const form={
             editKey: Math.floor(Math.random() * 1000000000000),
+            calendar: calURL,
             name:null,
             venue:null,
             startDate:null,
@@ -52,7 +63,7 @@ function Form(props) {
       e.preventDefault();
     console.log("event to be submitted by submit button...",state);
     props.createEvent(state);
-      props.history.push("/"); 
+      props.history.push("/calendar/" + props.match.params.calURL);
     }
         
 
@@ -61,13 +72,13 @@ function Form(props) {
 
 
 return(<div>
-    <div className="box" id="heading">
-  <h1> pdx music and arts calendar</h1>
-</div>
-
+    {/* <div className="box" id="heading">
+  <h1> open calendar </h1>
+</div> */}
 
 <div className="box">
-  <h1>Submit an event to the pdx music and arts calendar!</h1>
+  <Link to={"/calendar/"+calURL}><p className="link">or head back to the calendar...</p></Link>
+  <h1>Submit an event to the calendar<br/>'{ thisCalendar === undefined ? "" : thisCalendar.calName }'!</h1>
   <form onSubmit={handleSubmit}>
     <div className="form-group">
       <label htmlFor="name">Event name...* <input required onChange={handleChange} className="form-control" type="text" id="name"/></label>
@@ -104,17 +115,16 @@ return(<div>
 
 const mapStateToProps = (state) => {
   return {
-    eventInfo: state.eventInfo.events
+    calendarInfo: state.calendarInfo.calendars
   }
 }
-
 
 const mapDispatchToProps = (dispatch) => {
   return {
     createEvent: (event) => dispatch(createEvent(event)),
-    getEvents: () => dispatch(getEvents())
+    getCalendars: () => dispatch(getCalendars())
   }
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(Form);
+export default connect(mapStateToProps, mapDispatchToProps)(Submit);

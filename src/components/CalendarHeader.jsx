@@ -1,9 +1,25 @@
-import React, {useState} from "react";
+import React, {useState,useEffect} from "react";
 import Calendar from "./Calendar";
 import { Link } from "react-router-dom";
+import { getCalendars } from '../store/actions/calendarActions';
+import { connect } from 'react-redux';
+
+function CalendarHeader(props) {
+
+  const calURL = props.match.params.calURL;
+   console.log("calendar URL from <CalendarHeader/>:",calURL)
 
 
-function CalendarHeader() {
+  useEffect(() => {
+    if (props.calendarInfo.length===0) {
+            props.getCalendars();
+        }
+  }, [props]);
+
+
+  const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
+  console.log("this calendar:",thisCalendar);
+
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -49,9 +65,11 @@ year = monthYear[1];
     return (<div>
               <div className="container">
                 <div className="box" id="heading">
-                   <h1> pdx music and arts calendar</h1>
-                   <Link to="/Form"><p>submit an event!</p></Link>
-                   <Link to="/Search"><p>search for events...</p></Link>
+                   <h1> { thisCalendar === undefined ? "" : thisCalendar.calName } </h1>
+                   <h4 className="calSubheader"> { thisCalendar === undefined ? "" : thisCalendar.description } </h4>
+                   <Link to={"/calendar/"+props.match.params.calURL+"/submit"}><p className="link">submit an event to this calendar</p></Link>
+                   <Link to={"/calendar/"+props.match.params.calURL+"/search"}><p className="link">search for events within this calendar...</p></Link>
+                   <Link to="/"><p className="link">back to the home page</p></Link>
                  </div>
 
         <div className="calendar-container">
@@ -70,12 +88,25 @@ year = monthYear[1];
           </div>
       </div>
     </div>
-      <Calendar month={month} year={year}/>
+      <Calendar calURL={props.match.params.calURL} month={month} year={year}/>
  
     </div>
       
     );
+    
 }
 
 
-export default CalendarHeader;
+const mapStateToProps = (state) => {
+    return {
+        calendarInfo:state.calendarInfo.calendars
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        getCalendars: () => dispatch(getCalendars())
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(CalendarHeader);

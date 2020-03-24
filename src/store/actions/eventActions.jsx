@@ -7,6 +7,13 @@ export const createEvent = (event) => {
     }
 };
 
+export const updateEvent = (event) => {
+    return (dispatch,getState) => {
+        axios.post('http://localhost:5000/events/update/'+event._id,event);
+        dispatch({type: "UPDATE_EVENT",event})
+    }
+}
+
 export const getEvents = () => {
     return (dispatch,getState) => {
         axios.get('http://localhost:5000/events/')

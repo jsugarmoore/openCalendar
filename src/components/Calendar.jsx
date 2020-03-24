@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useEffect } from "react";
 import DayBox from "./DayBox";
 import { connect } from 'react-redux';
 import { getEvents } from '../store/actions/eventActions';
@@ -11,13 +11,16 @@ function createDayBox(day) {
 
 
 function Calendar(props) {
+console.log("props in <Calendar/>:",props)
+ 
+useEffect(() => {
+    if (props.eventInfo.length===0) {
+        props.getEvents();
+        console.log("running initial getEvents from <APP />...");
+    }
+ }, [props]);
 
- if (props.eventInfo.length===0) {
-     props.getEvents();
-     console.log("running initial getEvents from <APP />...");
- }
-
-    const eventInfo = props.eventInfo;
+    const eventInfo = props.eventInfo.filter((event) => {return (props.calURL === event.calendar)});
     console.log("data going into the calendar...",eventInfo);
 
     var month = props.month;
