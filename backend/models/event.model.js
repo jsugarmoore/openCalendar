@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const eventSchema = new Schema({
-      editKey: {type:Number},
+      editKey: {type:String},
       calendar: {type:String,required:true},
       name: {type:String,required:true},
       venue: {type:String,required:true},
@@ -15,7 +15,7 @@ const eventSchema = new Schema({
       ageRestriction: {type:String,required:true},
       cover: {type:String,required:true},
       keywords: {type:String,required:false},
-    //   timestamps:false
+      creationDate:{type:String}
     });
 
 const Event = mongoose.model('Event',eventSchema);

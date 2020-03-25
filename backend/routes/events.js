@@ -20,6 +20,7 @@ router.route('/add').post((req,res) => {
     const ageRestriction = req.body.ageRestriction;
     const cover = req.body.cover;
     const keywords = req.body.keywords;
+    const creationDate = req.body.creationDate;
 
     const newEvent = new Event({
       editKey,
@@ -33,7 +34,8 @@ router.route('/add').post((req,res) => {
       description,
       ageRestriction,
       cover,
-      keywords
+      keywords,
+      creationDate
     });
 
     newEvent.save()
@@ -47,7 +49,7 @@ router.route('/:id').get((req,res) => {
         .catch(err => res.status(400).json('Error: ' + err))
 });
 
-router.route('/:id').delete((req,res) => {
+router.route('/delete/:id').delete((req,res) => {
     Event.findByIdAndDelete(req.params.id)
         .then(event => res.json("event deleted."))
         .catch(err => res.status(400).json('Error: ' + err))
@@ -68,6 +70,7 @@ router.route('/update/:id').post((req,res) => {
             event.ageRestriction = req.body.ageRestriction;
             event.cover = req.body.cover;
             event.keywords = req.body.keywords;
+            event.creationDate = req.body.creationDate;
     
             event.save()
             .then(() => res.json("event updated..."))

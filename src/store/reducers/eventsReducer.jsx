@@ -24,6 +24,12 @@ function eventInfo(state=initState, action) {
             return {
                 events:[...stateMinusOldEvent,action.event]
             }
+        case 'DELETE_EVENT':
+            console.log('deleted event!',action.eventID,state);
+            const stateMinusDeletedEvent = state.events.filter((event) => {return (event._id !== action.eventID)});
+            return {
+                events: [...stateMinusDeletedEvent]
+            }
 
         default: return state}
 

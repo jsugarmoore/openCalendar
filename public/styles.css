@@ -136,6 +136,10 @@ footer {
     -webkit-transform: translateZ(0);
 }
 
+.day:hover {
+    background-color: rgb(244, 255, 244);
+}
+
 .dayNumber {
     position: fixed !important;
     z-index: 3;
@@ -171,6 +175,13 @@ footer {
 }
 .event-button:hover {
     background-color: rgb(71, 195, 236);
+}
+
+.timestamp {
+    font-family: Raleway;
+    font-size: 1rem;
+    font-weight:400;
+   
 }
 
 .day:nth-of-type(7n + 7) {
@@ -252,9 +263,10 @@ padding: 7px;
     background-color: rgb(110, 245, 151);
     border-radius: 5%;
     color:black;
- 
+}
 
-
+.modalDescription {
+    white-space: pre-wrap;
 }
 
 .searchBar {
@@ -284,6 +296,7 @@ padding: 7px;
     padding-top: 15px;
     border-left-width: 6px;
     box-shadow: 5px 5px 15px -5px rgba(181, 219, 174, 0.9);
+    white-space: pre-wrap;
 
 }
 

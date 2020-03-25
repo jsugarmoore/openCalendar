@@ -76,7 +76,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         getEvents: () => dispatch(getEvents())
-        // getCalendars: () => dispatch(getCalendars())
     }
 }
 

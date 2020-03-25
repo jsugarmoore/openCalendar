@@ -19,7 +19,7 @@ const calURL = props.match.params.calURL;
 const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
 
     const form={
-            editKey: Math.floor(Math.random() * 1000000000000),
+            editKey: Date.now()+''+Math.floor(Math.random() * 100000000000),
             calendar: calURL,
             name:null,
             venue:null,
@@ -30,7 +30,8 @@ const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.
             description: null,
             ageRestriction: false,
             cover: null,
-            keywords: " "
+            keywords: " ",
+            creationDate: null
     };
 
     const [state,setState] = useState(form);
@@ -51,7 +52,7 @@ const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.
       let endDateTime = new Date(state.endDate + " " + state.endTime);
       console.log("end date and time...", endDateTime);
       let duration = (endDateTime-startDateTime)/(1000*60*60);
-      console.log("duration...",duration)
+      console.log("duration...",duration, " hours.")
 
       if (duration<=0) {
         alert("Your event ends before it starts!! fix that, yo!")
@@ -60,6 +61,7 @@ const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.
 
       state.startDate = new Date(state.startDate.replace(/-/g, '/'));
       state.endDate = new Date(state.endDate.replace(/-/g, '/'));
+      state.creationDate = new Date(Date.now()).toDateString();
       e.preventDefault();
     console.log("event to be submitted by submit button...",state);
     props.createEvent(state);

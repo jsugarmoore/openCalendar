@@ -20,3 +20,10 @@ export const getEvents = () => {
         .then((response) => dispatch({type:"GET_EVENTS", payload:response.data})).catch(err => console.log(err))
     }
 }
+
+export const deleteEvent = (eventID) => {
+    return (dispatch,getState) => {
+        axios.delete('http://localhost:5000/events/delete/'+eventID)
+        dispatch({type: "DELETE_EVENT",eventID})
+    }
+}

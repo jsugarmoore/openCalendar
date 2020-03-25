@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Modal from "react-bootstrap/Modal";
+// import ModalFooter from "react-bootstrap/ModalFooter";
 import Button from "react-bootstrap/Button";
 import { connect } from 'react-redux';
-import { updateEvent } from "../store/actions/eventActions";
+import { updateEvent, deleteEvent } from "../store/actions/eventActions";
 
 
 function EventButton(props) {
@@ -22,7 +23,8 @@ function EventButton(props) {
     description:props.description,
     ageRestriction:(props.ageRestriction==='true'),
     cover:props.cover,
-    keywords:props.keywords
+    keywords:props.keywords,
+    creationDate:props.creationDate
   }
 
   const [show, setShow] = useState(false);
@@ -31,13 +33,13 @@ function EventButton(props) {
   const [state,setState] = useState("");
   const [eventState,setEventState] = useState(initEventState);
 
-  const handleClose = () => {setState("");setEventState(initEventState);setEdit(false);setShow(false)};
+  const handleClose = () => {setState("");setEventState(initEventState);setEdit(false);setEditClick(false);setShow(false)};
   const handleShow = () => setShow(true);
   const handleEditClick = () => setEditClick(true);
-  const handleCancelEdit = () => {setState("");setEventState(initEventState);setEdit(false)};
+  const handleCancelEdit = () => {setState("");setEventState(initEventState);setEdit(false);setEditClick(false)};
   const handleCancel = () => setEditClick(false);
   const handleSubmit = () => {
-    Number(state)===props.editKey ? setEdit(true) : alert((state==="" ? "that" : state)+" is not the correct edit ID. sorry!") 
+    Number(state)==props.editKey ? setEdit(true) : alert((state==="" ? "that" : state)+" is not the correct edit ID. sorry!") 
   }
   const handleChange = (e) => {
     setState(e.target.value);
@@ -75,46 +77,53 @@ function EventButton(props) {
     handleClose(); 
   };
 
-  const handleDelete = () => {console.log("you still need to deal with handling deleted events...")};
+  const handleDelete = () => {
+    if (window.confirm("are you sure you want to delete '"+props.name+"'?")) {
+      props.deleteEvent(props._id); 
+      handleClose();
+    } else {
+      return;
+    }
+  };
 
 
   return (
     <>
-      <Modal show={show} onHide={handleClose} size="xl">
+      <Modal scrollable="true" show={show} onHide={handleClose} size="xl">
         <Modal.Header closeButton>
           <Modal.Title>{edit===true ?  <input required id="name" onChange={handleEventEdit} value={eventState.name}/> : props.name+"..."}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>venue... {edit===true ?  <input required id="venue" onChange={handleEventEdit} value={eventState.venue}/> : props.venue}</p>
-          <p>start... {edit===true ?  <><input required type="date" onChange={handleEventEdit} value={eventState.startDate} id="startDate"/><input required value={eventState.startTime} onChange={handleEventEdit} type="time" id="startTime"/><br/></>
+          <p>start... {edit===true ?  <><input required type="date" onChange={handleEventEdit} value={eventState.startDate} id="startDate"/> <input required value={eventState.startTime} onChange={handleEventEdit} type="time" id="startTime"/><br/></>
           : <>{props.startDate.toDateString()} at {props.startTime}</>}</p>
-          <p>end... {edit===true ?  <><input required type="date" onChange={handleEventEdit} value={eventState.endDate} id="endDate"/><input required value={eventState.endTime} onChange={handleEventEdit} type="time" id="endTime"/><br/></>
+          <p>end... {edit===true ?  <><input required type="date" onChange={handleEventEdit} value={eventState.endDate} id="endDate"/> <input required value={eventState.endTime} onChange={handleEventEdit} type="time" id="endTime"/><br/></>
           : <>{props.endDate.toDateString()} at {props.endTime} </>}</p>
           <hr></hr>
-          <p>{edit===true ?  <>description... <textarea required id="description" value={eventState.description} rows="2" cols="40" onChange={handleEventEdit}/></> : props.description}</p>
+          <p className="modalDescription">{edit===true ?  <>description...  <textarea required id="description" value={eventState.description} rows="4" cols="60" onChange={handleEventEdit}/></> : props.description}</p>
           <p>{edit===true ? <>21+? <input onChange={handleEventEdit} type="checkbox" id="ageRestriction" value={eventState.ageRestriction} checked={eventState.ageRestriction===true ? 1 : 0}/></> : (props.ageRestriction==="true" ? "21+ " : "all ages ")}  
            {edit===true ? <><br/>cover charge? <input required onChange={handleEventEdit} id="cover" value={eventState.cover}/></> : " | "+props.cover} </p>
           <hr></hr>
           <p>keywords... {edit===true ?  <input required onChange={handleEventEdit} id="keywords" value={eventState.keywords}/> : props.keywords }</p>
         </Modal.Body>
         <Modal.Footer>
-
+          <p className="timestamp mr-auto">This event was created on {props.creationDate}</p>
         {/* ----------button logic ----------------- */}
-        
+        <>
         {edit===true ? 
-           <><Button variant="secondary" onClick={handleDelete}>Delete</Button>
-            <Button variant="secondary" onClick={handleCancelEdit}>Cancel without saving</Button>
-            <Button variant="secondary" onClick={handleSubmitChanges}>Submit changes</Button></> :
-          <>{ editClick===true ? <><label><input onChange={handleChange} placeholder={editPlaceholder}/></label><Button variant="secondary" onClick={handleCancel}>Cancel</Button></> :
-            <Button variant="secondary" onClick={handleEditClick}>Edit or Delete</Button>}
+           <><Button variant="secondary" onClick={handleDelete}>delete</Button>
+            <Button variant="secondary" onClick={handleCancelEdit}>cancel without saving</Button>
+            <Button variant="secondary" onClick={handleSubmitChanges}>submit changes</Button></> :
+          <>{ editClick===true ? <><label><input onChange={handleChange} placeholder={editPlaceholder}/></label><Button variant="secondary" onClick={handleCancel}>cancel</Button></> :
+            <Button variant="secondary" onClick={handleEditClick}>edit or delete</Button>}
           {editClick===true ?
             <Button variant="secondary" onClick={handleSubmit}>
-             submit
+             submit edit ID
             </Button> :
             <Button variant="secondary" onClick={handleClose}>
-            Close
+            close
           </Button> }</>
-          }
+          }</>
         {/* ----------button logic ----------------- */}
 
         </Modal.Footer>
@@ -135,7 +144,8 @@ function EventButton(props) {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        updateEvent: (event) => dispatch(updateEvent(event))
+        updateEvent: (event) => dispatch(updateEvent(event)),
+        deleteEvent: (eventID) => dispatch(deleteEvent(eventID))
     }
 }
 
