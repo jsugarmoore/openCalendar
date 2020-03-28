@@ -2,27 +2,44 @@ import React, {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 import { connect } from 'react-redux';
 import { getEvents } from "../store/actions/eventActions";
+import { getPublicCalendars, authenticateCalendar } from "../store/actions/calendarActions";
 
 var searchResults = [];
 
 function Search(props) {
 
-const calURL = props.match.params.calURL;
+ var calURL = "";
+  if (props.private) {
+     calURL = props.calURL 
+  } else {
+   calURL = props.match.params.calURL 
+  }
+
 console.log("props in search component:",props)
+const authorizedCal = props.auth;
+console.log("authorized to be here?",authorizedCal);
+const eventInfo = props.eventInfo.filter((event) => {return (calURL === event.calendar)});
+    console.log("search page event collection...",eventInfo);
 
 useEffect(() => {
 
-if (props.eventInfo.length===0) {
-        props.getEvents();
-    }    
-    });
+    if (eventInfo.length===0) {
+        props.getEvents(calURL);
+        console.log("running initial getEvents from <SEARCH />...");
+    }
+ }, []); 
+
+ useEffect(() => {
+
+    if (props.calendarInfo.length === 0) {
+        props.getPublicCalendars();     
+    } 
+
+  }, []);
 
  
     const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
     console.log("search page calendar:",thisCalendar);
-
-    const allEvents = props.eventInfo.filter((event) => {return (calURL === event.calendar)});
-    console.log("search page event collection...",allEvents);
 
     const [state,setState] = useState("");
 
@@ -30,7 +47,7 @@ if (props.eventInfo.length===0) {
         setState(e.target.value);
     }
 
-searchResults = allEvents.filter((event) => {
+searchResults = eventInfo.filter((event) => {
     return ((event.name.toLowerCase().includes(state.toLowerCase()) === true || event.venue.toLowerCase().includes(state.toLowerCase()) === true || event.description.toLowerCase().includes(state.toLowerCase()) === true || event.keywords.toLowerCase().includes(state.toLowerCase()) === true))
 });
 
@@ -49,9 +66,21 @@ searchResults = allEvents.filter((event) => {
         );
     }
 
-    return(
-    <div className="box">
-    <Link to={"/calendar/"+calURL}><p className="link">head back to the calendar { thisCalendar === undefined ? "" : "'"+thisCalendar.calName+"'" }...</p></Link>
+    const password = "turtles";
+    const [auth, setAuth] = useState(false);
+
+
+    function handleAuth(e) {
+        console.log(e.target.value);
+        if (e.target.value === password) {
+            setAuth(true);
+            props.authenticateCalendar(calURL);
+            // set global authorization for this particular calendar by mapping this action to the store
+        }
+    }
+
+    return(<>{(auth || (authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div className="box">
+    <Link to={"/calendar/"+calURL+(thisCalendar===undefined ? "" : (thisCalendar.public===true ? "" : "/private"))}><p className="link">head back to the calendar { thisCalendar === undefined ? "" : "'"+thisCalendar.calName+"'" }...</p></Link>
     <div className="searchBar">
     <input onChange={handleChange} name="searchTerms" type="text" placeholder="search..."/>
 
@@ -61,7 +90,8 @@ searchResults = allEvents.filter((event) => {
     <h3>{state.length===0 ? "all " : ""}events{state.length>0 ? " matching '"+state+"'" : null}...</h3>
         <div className="resultsBox">{searchResults.map(createSearchResult)}</div> 
     </div>
-    </div>
+    </div></>  : 
+<><div className="box"><input className="form-control" type="text" id="auth" onChange={handleAuth}/>enter the key...</div></>}</>
         );
 
 }
@@ -69,13 +99,16 @@ searchResults = allEvents.filter((event) => {
 const mapStateToProps = (state) => {
     return {
         eventInfo:state.eventInfo.events,
-        calendarInfo:state.calendarInfo.calendars
+        calendarInfo:state.calendarInfo.calendars,
+        auth:state.calendarInfo.auth
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getEvents: () => dispatch(getEvents())
+        getEvents: (calURL) => dispatch(getEvents(calURL)),
+        getPublicCalendars: () => dispatch(getPublicCalendars()),
+        authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL))
     }
 }
 

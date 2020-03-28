@@ -6,22 +6,23 @@ import { getEvents } from '../store/actions/eventActions';
 
 
 function createDayBox(day) {
-    return <DayBox key={day.date+"-"+day.month+"-"+day.year} date={day.date} isThisMonth={day.isThisMonth} todaysEvents={day.events}/>
+    return <DayBox key={day.date+"-"+day.month+"-"+day.year} month={day.month} year={day.year} date={day.date} isThisMonth={day.isThisMonth} todaysEvents={day.events}/>
 }
 
 
 function Calendar(props) {
 console.log("props in <Calendar/>:",props)
- 
-useEffect(() => {
-    if (props.eventInfo.length===0) {
-        props.getEvents();
-        console.log("running initial getEvents from <APP />...");
-    }
- }, [props]);
 
-    const eventInfo = props.eventInfo.filter((event) => {return (props.calURL === event.calendar)});
+const eventInfo = props.eventInfo.filter((event) => {return (props.calURL === event.calendar)});
     console.log("data going into the calendar...",eventInfo);
+
+useEffect(() => {
+
+    if (eventInfo.length===0) {
+        props.getEvents(props.calURL);
+        console.log("running initial getEvents from <CALENDAR />...");
+    }
+ }, []);
 
     var month = props.month;
     var year = props.year;
@@ -112,7 +113,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getEvents: () => dispatch(getEvents())
+        getEvents: (calURL) => dispatch(getEvents(calURL))
     }
 }
 

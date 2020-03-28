@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import Modal from "react-bootstrap/Modal";
-// import ModalFooter from "react-bootstrap/ModalFooter";
 import Button from "react-bootstrap/Button";
 import { connect } from 'react-redux';
 import { updateEvent, deleteEvent } from "../store/actions/eventActions";
 
 
 function EventButton(props) {
-
-  var editPlaceholder = "enter edit id...";
 
   const initEventState = {
     _id:props._id,
@@ -39,7 +36,7 @@ function EventButton(props) {
   const handleCancelEdit = () => {setState("");setEventState(initEventState);setEdit(false);setEditClick(false)};
   const handleCancel = () => setEditClick(false);
   const handleSubmit = () => {
-    Number(state)==props.editKey ? setEdit(true) : alert((state==="" ? "that" : state)+" is not the correct edit ID. sorry!") 
+    state===props.editKey ? setEdit(true) : alert((state==="" ? "that" : state)+" is not the correct edit ID. sorry!") 
   }
   const handleChange = (e) => {
     setState(e.target.value);
@@ -79,7 +76,7 @@ function EventButton(props) {
 
   const handleDelete = () => {
     if (window.confirm("are you sure you want to delete '"+props.name+"'?")) {
-      props.deleteEvent(props._id); 
+      props.deleteEvent(props.editKey); 
       handleClose();
     } else {
       return;
@@ -114,7 +111,7 @@ function EventButton(props) {
            <><Button variant="secondary" onClick={handleDelete}>delete</Button>
             <Button variant="secondary" onClick={handleCancelEdit}>cancel without saving</Button>
             <Button variant="secondary" onClick={handleSubmitChanges}>submit changes</Button></> :
-          <>{ editClick===true ? <><label><input onChange={handleChange} placeholder={editPlaceholder}/></label><Button variant="secondary" onClick={handleCancel}>cancel</Button></> :
+          <>{ editClick===true ? <><label><input onChange={handleChange} placeholder="enter edit id..." /></label><Button variant="secondary" onClick={handleCancel}>cancel</Button></> :
             <Button variant="secondary" onClick={handleEditClick}>edit or delete</Button>}
           {editClick===true ?
             <Button variant="secondary" onClick={handleSubmit}>
@@ -133,7 +130,7 @@ function EventButton(props) {
       <div className="eventButtonContainer">
         <button
           onClick={handleShow}
-          id={"button-" + props.editKey}
+          id={"button-" + props._id}
           className="event-button">
           {props.name} @ {props.venue}
         </button>
@@ -145,7 +142,7 @@ function EventButton(props) {
 const mapDispatchToProps = (dispatch) => {
     return {
         updateEvent: (event) => dispatch(updateEvent(event)),
-        deleteEvent: (eventID) => dispatch(deleteEvent(eventID))
+        deleteEvent: (editKey) => dispatch(deleteEvent(editKey))
     }
 }
 

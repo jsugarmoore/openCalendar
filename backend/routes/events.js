@@ -1,8 +1,9 @@
 const router = require('express').Router();
 let Event = require('../models/event.model');
 
-router.route('/').get((req, res) => {
-    Event.find()
+router.route('/:calURL').get((req, res) => {
+    
+    Event.find({"calendar":req.params.calURL}).sort({"startDate":1})
         .then(events => res.json(events))
         .catch(err => res.status(400).json('Error: ' + err));
 })
@@ -49,14 +50,14 @@ router.route('/:id').get((req,res) => {
         .catch(err => res.status(400).json('Error: ' + err))
 });
 
-router.route('/delete/:id').delete((req,res) => {
-    Event.findByIdAndDelete(req.params.id)
+router.route('/delete/:editKey').delete((req,res) => {
+    Event.deleteOne({"editKey":req.params.editKey})
         .then(event => res.json("event deleted."))
         .catch(err => res.status(400).json('Error: ' + err))
 });
 
-router.route('/update/:id').post((req,res) => {
-    Event.findById(req.params.id)
+router.route('/update/:editKey').post((req,res) => {
+    Event.findOne({"editKey":req.params.editKey})
         .then(event => {
             event.editKey = req.body.editKey;
             event.calendar = req.body.calendar;

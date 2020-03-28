@@ -8,13 +8,17 @@ function createEventButton(event) {
 
 function DayBox(props) {
 
+    function handleClick() {
+        console.log("[month,date,year]...", [props.month,props.date,props.year]);
+    }
+
    const todaysEvents = props.todaysEvents;
 
     const notThisMonth = { backgroundColor: '#fff591',opacity: '50%'};
 
   return (
     <div className="day" style={props.isThisMonth ? null : notThisMonth}>
-        <div className="dayNumber">
+        <div className="dayNumber" onClick={handleClick}>
             {props.date}
         </div>
         

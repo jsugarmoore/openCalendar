@@ -1,23 +1,31 @@
 import React, {useState,useEffect} from "react";
 import Calendar from "./Calendar";
 import { Link } from "react-router-dom";
-import { getCalendars } from '../store/actions/calendarActions';
+import { getPublicCalendars,authenticateCalendar } from '../store/actions/calendarActions';
 import { connect } from 'react-redux';
 
 function CalendarHeader(props) {
 
-  const calURL = props.match.params.calURL;
-   console.log("calendar URL from <CalendarHeader/>:",calURL)
+  var calURL = "";
+  if (props.private) {
+     calURL = props.calURL 
+  } else {
+   calURL = props.match.params.calURL 
+  }
 
 
+console.log("props inside CalendarHeader", props)
   useEffect(() => {
-    if (props.calendarInfo.length===0) {
-            props.getCalendars();
-        }
+
+    if (props.calendarInfo.length === 0) {
+        props.getPublicCalendars();     
+    } 
+
   }, [props]);
 
 
   const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
+  const authorizedCal = props.auth;
   console.log("this calendar:",thisCalendar);
 
 
@@ -35,6 +43,7 @@ function handleChange(event) {
   }
 
 function reloadCalendar(event) {
+  console.log("reload calendar with this date", [new Date(date).getMonth(), new Date(date).getFullYear()]);
   submitMonthYear([new Date(date).getMonth(), new Date(date).getFullYear()]);
   event.preventDefault();
 }
@@ -62,15 +71,31 @@ function lastMonth(event) {
 month = monthYear[0];
 year = monthYear[1];
 
-    return (<div>
-              <div className="container">
+
+const password = "turtles";
+const [auth,setAuth] = useState(false);
+
+
+function handleAuth(e) {
+  console.log(e.target.value);
+  if (e.target.value===password) {
+    props.authenticateCalendar(calURL);
+    setAuth(true);
+    // set global authorization for this particular calendar by mapping this action to the store
+  }
+}
+
+
+
+    return ( <>{(auth || (authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div className="container">
                 <div className="box" id="heading">
                    <h1> { thisCalendar === undefined ? "" : thisCalendar.calName } </h1>
                    <h4 className="calSubheader"> { thisCalendar === undefined ? "" : thisCalendar.description } </h4>
-                   <Link to={"/calendar/"+props.match.params.calURL+"/submit"}><p className="link">submit an event to this calendar</p></Link>
-                   <Link to={"/calendar/"+props.match.params.calURL+"/search"}><p className="link">search for events within this calendar...</p></Link>
-                   <Link to="/"><p className="link">back to the home page</p></Link>
-                 </div>
+                   <p className="timestamp">created on { thisCalendar === undefined ? "" : thisCalendar.creationDate}</p>
+                   <div className="row container iconsBar"><div className="col icons"><Link to={"/calendar/"+calURL+"/"+ ((thisCalendar === undefined) ? "" : (thisCalendar.public ? "" : "private/"))+"submit"}><p className="link">add an event</p></Link></div>
+                   <div className="col icons"><Link to="/"><p className="link">home</p></Link></div>
+                   <div className="col icons"><Link to={"/calendar/"+calURL+"/"+ ((thisCalendar === undefined) ? "" : (thisCalendar.public ? "" : "private/"))+"search"}><p className="link">search for events</p></Link></div>
+                 </div></div>
 
         <div className="calendar-container">
           <div className="calendar-header">
@@ -88,24 +113,25 @@ year = monthYear[1];
           </div>
       </div>
     </div>
-      <Calendar calURL={props.match.params.calURL} month={month} year={year}/>
- 
-    </div>
-      
-    );
-    
-}
+<Calendar calURL={calURL} month={month} year={year}/> </> : 
+<><div className="box"><input className="form-control" type="text" id="auth" onChange={handleAuth}/>enter the key...</div></> 
+      }
+        </>);   
+        
+      }
 
 
 const mapStateToProps = (state) => {
     return {
-        calendarInfo:state.calendarInfo.calendars
+        calendarInfo:state.calendarInfo.calendars,
+        auth:state.calendarInfo.auth
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getCalendars: () => dispatch(getCalendars())
+        getPublicCalendars: () => dispatch(getPublicCalendars()),
+        authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL))
     }
 }
 

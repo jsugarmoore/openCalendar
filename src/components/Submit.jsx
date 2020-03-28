@@ -1,25 +1,30 @@
 import React, {useState,useEffect} from "react";
 import { createEvent } from '../store/actions/eventActions';
-import { getCalendars} from '../store/actions/calendarActions';
+import { getPublicCalendars,authenticateCalendar } from '../store/actions/calendarActions';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 
 function Submit(props) {
 
-const calURL = props.match.params.calURL;
+ var calURL = "";
+  if (props.private) {
+     calURL = props.calURL 
+  } else {
+   calURL = props.match.params.calURL 
+  }
 
   useEffect(() => {
+    console.log("fetching calendars...");
     if (props.calendarInfo.length === 0) {
-      props.getCalendars();
+      props.getPublicCalendars();
     }
   }, [props]);
 
-
-
 const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
+console.log("this calendar is ",calURL,thisCalendar);
 
     const form={
-            editKey: Date.now()+''+Math.floor(Math.random() * 100000000000),
+            editKey: Date.now().toString(36)+''+Math.random().toString(36).replace('0.','')+''+Math.random().toString(36).replace('0.',''),
             calendar: calURL,
             name:null,
             venue:null,
@@ -63,24 +68,32 @@ const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.
       state.endDate = new Date(state.endDate.replace(/-/g, '/'));
       state.creationDate = new Date(Date.now()).toDateString();
       e.preventDefault();
-    console.log("event to be submitted by submit button...",state);
-    props.createEvent(state);
+      console.log("event to be submitted by submit button...",state);
+      props.createEvent(state);
       props.history.push("/calendar/" + props.match.params.calURL);
     }
         
 
 
 
+const password = "turtles";
+const [auth,setAuth] = useState(false);
+const authorizedCal = props.auth;
 
+function handleAuth(e) {
+  console.log(e.target.value);
+  if (e.target.value===password) {
+    props.authenticateCalendar(calURL);
+    setAuth(true);
+    // set global authorization for this particular calendar by mapping this action to the store
+  }
+}
 
-return(<div>
-    {/* <div className="box" id="heading">
-  <h1> open calendar </h1>
-</div> */}
-
+return(<>{(auth || (authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div>
+ 
 <div className="box">
-  <Link to={"/calendar/"+calURL}><p className="link">or head back to the calendar...</p></Link>
-  <h1>Submit an event to the calendar<br/>'{ thisCalendar === undefined ? "" : thisCalendar.calName }'!</h1>
+  <Link to={"/calendar/"+calURL+(thisCalendar===undefined ? "" : (thisCalendar.public===true ? "" : "/private"))}><p className="link">or head back to the calendar...</p></Link>
+  <h1>Submit an event to the calendar<br/>'{ thisCalendar === undefined ? "" : thisCalendar.calName }'</h1>
   <form onSubmit={handleSubmit}>
     <div className="form-group">
       <label htmlFor="name">Event name...* <input required onChange={handleChange} className="form-control" type="text" id="name"/></label>
@@ -100,7 +113,7 @@ return(<div>
       <label htmlFor="description">Event description...* </label><textarea required onChange={handleChange} className="form-control" id="description" rows="4" cols="40"></textarea>
     </div>
     <div className="form-group">
-      <label htmlFor="ageRestriction">21+? </label><input onChange={handleChange} className="form-control" type="checkbox" id="ageRestriction" />
+      <label htmlFor="ageRestriction">21+? </label>&nbsp;&nbsp;&nbsp;<input onChange={handleChange} type="checkbox" id="ageRestriction" />
     </div>
     <div className="form-group">
       <label htmlFor="cover">cover charge?*  <input required onChange={handleChange} className="form-control" type="text" id="cover" /></label>
@@ -111,20 +124,24 @@ return(<div>
     <button className="btn btn-info" type="submit">submit your event</button>
   </form>
 </div>
-</div>);
+</div></> : 
+<><div className="box"><input className="form-control" type="text" id="auth" onChange={handleAuth}/>enter the key...</div></>}</>
+);
 }
 
 
 const mapStateToProps = (state) => {
   return {
-    calendarInfo: state.calendarInfo.calendars
+    calendarInfo: state.calendarInfo.calendars,
+    auth: state.calendarInfo.auth
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     createEvent: (event) => dispatch(createEvent(event)),
-    getCalendars: () => dispatch(getCalendars())
+    getPublicCalendars: () => dispatch(getPublicCalendars()),
+    authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL))
   }
 }
 
