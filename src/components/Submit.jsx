@@ -1,8 +1,9 @@
 import React, {useState,useEffect} from "react";
 import { createEvent } from '../store/actions/eventActions';
-import { getPublicCalendars,authenticateCalendar } from '../store/actions/calendarActions';
+import { getCalendars,authenticateCalendar } from '../store/actions/calendarActions';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
+import Authenticate from "./Authenticate";
 
 function Submit(props) {
 
@@ -10,17 +11,20 @@ function Submit(props) {
   if (props.private) {
      calURL = props.calURL 
   } else {
-   calURL = props.match.params.calURL 
+     calURL = props.match.params.calURL 
   }
 
-  useEffect(() => {
-    console.log("fetching calendars...");
-    if (props.calendarInfo.length === 0) {
-      props.getPublicCalendars();
-    }
-  }, [props]);
+  const authorizedCal = props.auth;
 
-const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
+ useEffect(() => {
+
+    props.getCalendars();
+    console.log("fetching calendars list within <Submit />...")
+
+  },[]);
+
+const thisCalendar = props.calendarList.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
+console.log("props within <Submit />...",props);
 console.log("this calendar is ",calURL,thisCalendar);
 
     const form={
@@ -69,27 +73,13 @@ console.log("this calendar is ",calURL,thisCalendar);
       state.creationDate = new Date(Date.now()).toDateString();
       e.preventDefault();
       console.log("event to be submitted by submit button...",state);
+      console.log("calURL: ",calURL," & props.private: ",props.private);
       props.createEvent(state);
-      props.history.push("/calendar/" + props.match.params.calURL);
+      props.history.push("/calendar/" + calURL+ ( (props.private) ? "/private" : ""));
     }
         
 
-
-
-const password = "turtles";
-const [auth,setAuth] = useState(false);
-const authorizedCal = props.auth;
-
-function handleAuth(e) {
-  console.log(e.target.value);
-  if (e.target.value===password) {
-    props.authenticateCalendar(calURL);
-    setAuth(true);
-    // set global authorization for this particular calendar by mapping this action to the store
-  }
-}
-
-return(<>{(auth || (authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div>
+return(<>{((authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div>
  
 <div className="box">
   <Link to={"/calendar/"+calURL+(thisCalendar===undefined ? "" : (thisCalendar.public===true ? "" : "/private"))}><p className="link">or head back to the calendar...</p></Link>
@@ -125,14 +115,14 @@ return(<>{(auth || (authorizedCal===calURL) || (thisCalendar===undefined ? false
   </form>
 </div>
 </div></> : 
-<><div className="box"><input className="form-control" type="text" id="auth" onChange={handleAuth}/>enter the key...</div></>}</>
+<><Authenticate calURL={calURL} /></>}</>
 );
 }
 
 
 const mapStateToProps = (state) => {
   return {
-    calendarInfo: state.calendarInfo.calendars,
+    calendarList: state.calendarInfo.calendarList,
     auth: state.calendarInfo.auth
   }
 }
@@ -140,7 +130,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     createEvent: (event) => dispatch(createEvent(event)),
-    getPublicCalendars: () => dispatch(getPublicCalendars()),
+    getCalendars: () => dispatch(getCalendars()),
     authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL))
   }
 }

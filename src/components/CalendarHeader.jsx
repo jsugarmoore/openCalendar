@@ -1,8 +1,9 @@
 import React, {useState,useEffect} from "react";
 import Calendar from "./Calendar";
 import { Link } from "react-router-dom";
-import { getPublicCalendars,authenticateCalendar } from '../store/actions/calendarActions';
+import { getCalendars,getPublicCalendars,authenticateCalendar } from '../store/actions/calendarActions';
 import { connect } from 'react-redux';
+import Authenticate from './Authenticate';
 
 function CalendarHeader(props) {
 
@@ -23,8 +24,15 @@ console.log("props inside CalendarHeader", props)
 
   }, [props]);
 
+  useEffect(() => {
 
-  const thisCalendar = props.calendarInfo.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
+    props.getCalendars();
+    console.log("fetching calendars list...")
+
+  },[]);
+
+
+  const thisCalendar = props.calendarList.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
   const authorizedCal = props.auth;
   console.log("this calendar:",thisCalendar);
 
@@ -72,22 +80,7 @@ month = monthYear[0];
 year = monthYear[1];
 
 
-const password = "turtles";
-const [auth,setAuth] = useState(false);
-
-
-function handleAuth(e) {
-  console.log(e.target.value);
-  if (e.target.value===password) {
-    props.authenticateCalendar(calURL);
-    setAuth(true);
-    // set global authorization for this particular calendar by mapping this action to the store
-  }
-}
-
-
-
-    return ( <>{(auth || (authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div className="container">
+    return ( <>{((authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div className="container">
                 <div className="box" id="heading">
                    <h1> { thisCalendar === undefined ? "" : thisCalendar.calName } </h1>
                    <h4 className="calSubheader"> { thisCalendar === undefined ? "" : thisCalendar.description } </h4>
@@ -114,24 +107,26 @@ function handleAuth(e) {
       </div>
     </div>
 <Calendar calURL={calURL} month={month} year={year}/> </> : 
-<><div className="box"><input className="form-control" type="text" id="auth" onChange={handleAuth}/>enter the key...</div></> 
+<><Authenticate calURL={calURL} /></> 
       }
         </>);   
-        
-      }
+    }  
+                    //  cut all of this stuff ^^^^ and put it in full authentication component wrapper
 
 
 const mapStateToProps = (state) => {
     return {
         calendarInfo:state.calendarInfo.calendars,
-        auth:state.calendarInfo.auth
+        auth:state.calendarInfo.auth,
+        calendarList:state.calendarInfo.calendarList
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
         getPublicCalendars: () => dispatch(getPublicCalendars()),
-        authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL))
+        authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL)),
+        getCalendars: () => dispatch(getCalendars())
     }
 }
 

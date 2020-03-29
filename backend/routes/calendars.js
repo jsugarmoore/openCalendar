@@ -2,7 +2,7 @@ const router = require('express').Router();
 let Calendar = require('../models/calendar.model');
 
 router.route('/all').get((req, res) => {
-    Calendar.find()
+    Calendar.find({},{"calURL":1,"public":1,"calName":1})
         .then(calendars => res.json(calendars))
         .catch(err => res.status(400).json('Error: ' + err));
 })

@@ -10,7 +10,7 @@ function SubmitPrivateCalendar(props) {
 
 useEffect(() => {
 
-    if (props.calendarInfo.length === 0) {
+    if (props.auth && props.calendarInfo.filter((calendar) => {return (calendar.public===false)}).length === 0) {
         props.getPrivateCalendar(calURL);     
     } 
   }, [props]);
@@ -18,7 +18,7 @@ useEffect(() => {
   console.log("props within <SubmitPrivateCalendar />",props)
 
     return (<div>
-        <Submit private={true} calURL={calURL}/>
+        <Submit history={props.history} private={true} calURL={calURL}/>
     </div>
 
     )
@@ -28,6 +28,7 @@ useEffect(() => {
 const mapStateToProps = (state) => {
     return {
         calendarInfo:state.calendarInfo.calendars,
+        auth:state.calendarInfo.auth
     }
 }
 

@@ -1,6 +1,7 @@
 const calendars = [];
 const auth = "";
-const initState = { calendars,auth }
+const calendarList = [];
+const initState = { calendars,auth,calendarList }
 
 
 function calendarInfo(state = initState, action) {
@@ -9,33 +10,39 @@ function calendarInfo(state = initState, action) {
             console.log('created calendar!', action.calendar, state);
             return {
                 calendars: [...state.calendars, action.calendar],
-                    auth: state.auth
+                    auth: state.auth,
+                    calendarList: [...state.calendarList]
             }
             case 'GET_CALENDARS':
-                console.log('calendars received into reducer...', action.payload, state);
+                console.log('calendars URLs/public status -- received into reducer...', action.payload, state);
                 return {
-                    calendars: [...state.calendars, ...action.payload],
-                        auth: state.auth
+                    calendars: [...state.calendars],
+                        auth: state.auth,
+                    calendarList: [...action.payload]
                 }
             case 'GET_PUBLIC_CALENDARS':
                 console.log('public calendars received into reducer...',action.payload,state)
                 
                 return {
                     calendars: [...state.calendars, ...action.payload],
-                        auth: state.auth
+                        auth: state.auth,
+                    calendarList: [...state.calendarList]
+                 
                 }
         
             case 'GET_PRIVATE_CALENDAR':
             console.log('private calendar received into reducer...', action.payload, state)
             return {
                 calendars: [...state.calendars, action.payload],
-                    auth: state.auth
+                    auth: state.auth,
+                    calendarList: [...state.calendarList]
             }
             case 'AUTHENTICATE_CALENDAR':
             console.log('AUTHENTICATED calendar for this session...',action.calURL,state);
             return {
                 calendars:[...state.calendars],
-                auth: action.calURL
+                auth: action.calURL,
+                calendarList: [...state.calendarList]
             }
                 default:
                     return state

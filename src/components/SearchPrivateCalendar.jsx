@@ -10,7 +10,7 @@ function SubmitPrivateCalendar(props) {
 
 useEffect(() => {
 
-    if (props.calendarInfo.length === 0) {
+    if (props.auth && props.calendarInfo.filter((calendar) => {return (calendar.public===false)}).length === 0) {
         props.getPrivateCalendar(calURL);     
     } 
   }, [props]);
@@ -28,6 +28,7 @@ useEffect(() => {
 const mapStateToProps = (state) => {
     return {
         calendarInfo:state.calendarInfo.calendars,
+        auth:state.calendarInfo.auth
     }
 }
 

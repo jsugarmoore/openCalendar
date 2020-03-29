@@ -8,14 +8,14 @@ const randomString = Date.now().toString(36)+''+Math.random().toString(36).repla
 
 function Create(props) {
 
-const dbCalendars = props.calendarInfo;
-console.log("all public calendars in the db...",dbCalendars);
+const calendarList = props.calendarList;
+console.log("all calendar URLs & public status...",calendarList);
 
   useEffect(() => {
-    if (dbCalendars.length === 0) {
+    // if (calendarList.length === 0) {
       props.getCalendars();
-    }
-  }, [props]);
+    // }
+  }, []);
 
     const calForm={
             editKey: Date.now().toString(30)+''+Math.random().toString(36).replace('0.','')+''+Math.random().toString(36).replace('0.',''),
@@ -38,13 +38,13 @@ console.log("all public calendars in the db...",dbCalendars);
      
         let urlLowerCase = e.target.value.toLowerCase();
         let regexMatch = urlLowerCase.match(regex);
-        isMatch = dbCalendars.some((calendar) => {return (calendar.calURL.toLowerCase()===urlLowerCase)});
+        isMatch = calendarList.some((calendar) => {return (calendar.calURL.toLowerCase()===urlLowerCase)});
         setMatch(isMatch);
         setURL(urlLowerCase);
         setState(Object.assign({},state,{[e.target.id]:urlLowerCase}));
         console.log("url match regex string... ", regexMatch);
         console.log("url string... ", urlLowerCase);
-        if (e.target.value=="" || regexMatch==null) {
+        if (e.target.value==="" || regexMatch==null) {
           setBadChar(false);
         } else if (urlLowerCase.length !== regexMatch.length) {
           setBadChar(true);
@@ -61,6 +61,7 @@ console.log("all public calendars in the db...",dbCalendars);
         calURL: ((state.public) ? randomString : "")
       }));
       setURL("");
+      setMatch(false);
       console.log("state object inside handlePublicChange",state);
     }
    
@@ -103,10 +104,10 @@ return(<div>
       <label htmlFor="calName">Calendar name...* <input required onChange={handleChange} className="form-control" type="text" id="calName"/></label>
     </div>&nbsp;&nbsp;&nbsp;
     {(state.public) ? <div className="form-group">
-      <label htmlFor="calURL">{ (match===true) ? "URL suffix...*  << this url is taken :(" : "URL suffix...* "}
+      <label htmlFor="calURL">{ (match===true) ? "URL suffix...*  << this url is taken >>" : "URL suffix...* "}
       <input required onChange={handleURLChange} className="form-control" type="text" id="calURL" /></label>
     </div> : "" }</div>
-    <p className="formtext">URL preview... http://localhost:3000/calendars/{(state.public===false) ? calForm.calURL+"/" : ""}{(match) ? "<<THIS URL IS TAKEN :(" : url} </p>
+    < p className = "formtext" > URL preview...http: //localhost:3000/calendars/{(state.public===false) ? calForm.calURL+"/" : ""}{(match) ? <span className="urlTaken">THIS URL IS TAKEN</span> : url} </p>
     <p className="formtext">{(badChar) ? "no special characters -- only use A-Z,a-z,0-9" : ""}</p>
     <div className="form-group">
       <label htmlFor="public">Is this a public calendar? </label>&nbsp;&nbsp;&nbsp;<input onChange={handlePublicChange} type="checkbox" id="public" /> 
@@ -129,7 +130,8 @@ return(<div>
 
 const mapStateToProps = (state) => {
   return {
-    calendarInfo: state.calendarInfo.calendars
+    calendarInfo: state.calendarInfo.calendars,
+    calendarList: state.calendarInfo.calendarList
   }
 }
 
