@@ -1,5 +1,7 @@
 import React from "react";
 import EventButton from "./EventButton";
+import { connect } from "react-redux";
+import { setCurrentView } from "../store/actions/calendarActions";
 
 
 function createEventButton(event) {
@@ -7,19 +9,21 @@ function createEventButton(event) {
 }
 
 function DayBox(props) {
-
-    function handleClick() {
-        console.log("[month,date,year]...", [props.month,props.date,props.year]);
+    function handleDayView() {
+        let viewInfo = {calURL:props.calURL,month:props.month,date:props.date,year:props.year,view:"day"};
+        console.log("new view info...",viewInfo);
+        props.setCurrentView(viewInfo);
     }
 
    const todaysEvents = props.todaysEvents;
-
-    const notThisMonth = { backgroundColor: '#fff591',opacity: '50%'};
+   const notThisMonth = { backgroundColor: '#fff591',opacity: '50%'};
 
   return (
     <div className="day" style={props.isThisMonth ? null : notThisMonth}>
-        <div className="dayNumber" onClick={handleClick}>
-            {props.date}
+        <div className="dayNumber" onClick={handleDayView}>
+           
+                {props.date}
+            
         </div>
         
         <div className="eventsContainer">
@@ -29,4 +33,10 @@ function DayBox(props) {
     );
 }
 
-export default DayBox;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setCurrentView: (viewInfo) => dispatch(setCurrentView(viewInfo))
+    }
+}
+
+export default connect(null,mapDispatchToProps)(DayBox);

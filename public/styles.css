@@ -107,6 +107,15 @@ footer {
     max-width: 1200px;
 }
 
+.calendar-day-container {
+    padding:20px
+}
+
+.calGroup {
+    vertical-align: middle;
+    align-items: center;
+}
+
 .calendar-header {
     text-align: center;
     font-family: 'Montserrat';
@@ -186,6 +195,27 @@ footer {
     border-radius: 10%;
 }
 
+.fullDate {
+    color:gray;
+    font-family: 'Raleway';
+    font-weight: 600;
+    font-size: 15px;
+    padding:10px;
+    text-align: center;
+}
+.monthYear {
+    text-align: center;
+    width: 400px;
+}
+
+.monthSelector {
+    width: 400px;
+}
+
+.monthYear:hover {
+    background-color: lawngreen;
+}
+
 .dayNumber:hover {
     background-color: lawngreen;
 }
@@ -210,15 +240,18 @@ footer {
     margin-right: 17px;
 
 }
+
 .event-button {
-    font-family: 'Montserrat';
-    margin: 2px;
-    background-color: lightblue;
-    border-radius: 5%;
-    border-width: 2px;
-    z-index: 2;
-    text-align: left;
+ font-family: 'Montserrat';
+ margin: 2px;
+ background-color: rgb(245, 248, 215);
+ /* border-radius: 5%;
+ border-width: 2px; */
+padding:3px;
+ z-index: 2;
+ text-align: left;
 }
+
 .event-button:hover {
     background-color: rgb(71, 195, 236);
 }
@@ -391,7 +424,7 @@ position: relative;
 
 .row {
     text-align: left;
-    width: 600px;
+    /* width: 600px; */
     position:relative;
     padding: 20px 20px 0 20px;
 }

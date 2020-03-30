@@ -98,7 +98,7 @@ function EventButton(props) {
           : <>{props.endDate.toDateString()} at {props.endTime} </>}</p>
           <hr></hr>
           <p className="modalDescription">{edit===true ?  <>description...  <textarea required id="description" value={eventState.description} rows="4" cols="60" onChange={handleEventEdit}/></> : props.description}</p>
-          <p>{edit===true ? <>21+? <input onChange={handleEventEdit} type="checkbox" id="ageRestriction" value={eventState.ageRestriction} checked={eventState.ageRestriction===true ? 1 : 0}/></> : (props.ageRestriction==="true" ? "21+ " : "all ages ")}  
+          <p>{edit===true ? <>21+? <input onChange={handleEventEdit} type="checkbox" id="ageRestriction" value={eventState.ageRestriction} checked={eventState.ageRestriction===true ? 1 : 0}/></> : (props.ageRestriction==='true' ? "21+ " : "all ages ")}  
            {edit===true ? <><br/>cover charge? <input required onChange={handleEventEdit} id="cover" value={eventState.cover}/></> : " | "+props.cover} </p>
           <hr></hr>
           <p>keywords... {edit===true ?  <input required onChange={handleEventEdit} id="keywords" value={eventState.keywords}/> : props.keywords }</p>
@@ -128,12 +128,12 @@ function EventButton(props) {
       
 
       <div className="eventButtonContainer">
-        <button
+        <div
           onClick={handleShow}
           id={"button-" + props._id}
           className="event-button">
-          {props.name} @ {props.venue}
-        </button>
+          &#10047;&nbsp;{props.name} @ {props.venue}
+        </div>
       </div>
     </>
   );

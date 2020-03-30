@@ -16,11 +16,9 @@ return(<div>
   <h2 className="homepage"><Link to="/Create"><span className="link">create a calendar</span></Link></h2>
 
 </div>
-{/* <div className="box homepageBox"> */}
-  <PublicCalendars/>
-  {/* <h2 className="homepage"><Link to="/PublicCalendars"><span className="link">browse public calendars...</span></Link></h2> */}
+  <PublicCalendars />
 </div>);
-// </div>);
+
 
 }
 

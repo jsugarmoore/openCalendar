@@ -4,23 +4,23 @@ import { getCalendars,authenticateCalendar } from  '../store/actions/calendarAct
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 
-const randomString = Date.now().toString(36)+''+Math.random().toString(36).replace('0.','')+''+Math.random().toString(36).replace('0.','')
+const randomString = Date.now().toString(30)+''+Math.random().toString(36).replace('0.','')+''+Math.random().toString(36).replace('0.','')
 
 function Create(props) {
 
 const calendarList = props.calendarList;
+const newURL = props.calURL;
 console.log("all calendar URLs & public status...",calendarList);
+console.log("newURL from nonexistent page...",newURL);
 
   useEffect(() => {
-    // if (calendarList.length === 0) {
       props.getCalendars();
-    // }
   }, []);
 
     const calForm={
-            editKey: Date.now().toString(30)+''+Math.random().toString(36).replace('0.','')+''+Math.random().toString(36).replace('0.',''),
+            editKey: randomString,
             calName:null,
-            calURL:randomString,
+            calURL:(newURL===undefined ? null : newURL),
             public:false,
             description:null,
             keywords: " ",
@@ -32,7 +32,8 @@ console.log("all calendar URLs & public status...",calendarList);
     const [state,setState] = useState(calForm);
     const [match,setMatch] = useState(false);
     const [badChar,setBadChar] = useState(false);
-    const [url,setURL] = useState("");
+    const [url,setURL] = useState((newURL===undefined ? "" : newURL));
+  
 
     function handleURLChange(e) {
      
@@ -44,8 +45,10 @@ console.log("all calendar URLs & public status...",calendarList);
         setState(Object.assign({},state,{[e.target.id]:urlLowerCase}));
         console.log("url match regex string... ", regexMatch);
         console.log("url string... ", urlLowerCase);
-        if (e.target.value==="" || regexMatch==null) {
+        if (e.target.value==="") {
           setBadChar(false);
+        } else if (regexMatch===null && urlLowerCase.length>0) {
+          setBadChar(true);
         } else if (urlLowerCase.length !== regexMatch.length) {
           setBadChar(true);
         } else {
@@ -57,11 +60,9 @@ console.log("all calendar URLs & public status...",calendarList);
     function handlePublicChange(e) {
 
       setState(Object.assign({}, state, {
-        public: !(state.public),
-        calURL: ((state.public) ? randomString : "")
+        public: !(state.public)
       }));
-      setURL("");
-      setMatch(false);
+
       console.log("state object inside handlePublicChange",state);
     }
    
@@ -91,10 +92,10 @@ console.log("all calendar URLs & public status...",calendarList);
   }  
 
 
-return(<div>
-    <div className="box" id="heading">
+return(<div>{(newURL===undefined) ? 
+    <><div className="box" id="heading">
   <h1> open calendar </h1>
-</div>
+</div></> : ""}
 
 <div className="box">
 <Link to="/"><p className="link">or head back to the home page...</p></Link>
@@ -103,12 +104,12 @@ return(<div>
     <div className="row"><div className="form-group">
       <label htmlFor="calName">Calendar name...* <input required onChange={handleChange} className="form-control" type="text" id="calName"/></label>
     </div>&nbsp;&nbsp;&nbsp;
-    {(state.public) ? <div className="form-group">
+    <div className="form-group">
       <label htmlFor="calURL">{ (match===true) ? "URL suffix...*  << this url is taken >>" : "URL suffix...* "}
-      <input required onChange={handleURLChange} className="form-control" type="text" id="calURL" /></label>
-    </div> : "" }</div>
-    < p className = "formtext" > URL preview...http: //localhost:3000/calendars/{(state.public===false) ? calForm.calURL+"/" : ""}{(match) ? <span className="urlTaken">THIS URL IS TAKEN</span> : url} </p>
-    <p className="formtext">{(badChar) ? "no special characters -- only use A-Z,a-z,0-9" : ""}</p>
+      <input required onChange={handleURLChange} className="form-control" type="text" id="calURL" value={url} /></label>
+    </div></div>
+    <p className = "formtext" > URL preview...http: //localhost:3000/calendars/{(match) ? <span className="urlTaken">THIS URL IS TAKEN</span> : url}{((url==="") ? "" : "/")}{(state.public ? "" : "private")} </p>
+    <p className="formtext">{(badChar) ? <><span className="urlTaken">no special characters -- only use A-Z,a-z,0-9</span></> : ""}</p>
     <div className="form-group">
       <label htmlFor="public">Is this a public calendar? </label>&nbsp;&nbsp;&nbsp;<input onChange={handlePublicChange} type="checkbox" id="public" /> 
       <p className="formtext">public calendars are searchable from the homepage by anyone.<br/>

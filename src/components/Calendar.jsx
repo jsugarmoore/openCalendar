@@ -4,14 +4,17 @@ import { connect } from 'react-redux';
 import { getEvents } from '../store/actions/eventActions';
 
 
+var calURL = "";
 
 function createDayBox(day) {
-    return <DayBox key={day.date+"-"+day.month+"-"+day.year} month={day.month} year={day.year} date={day.date} isThisMonth={day.isThisMonth} todaysEvents={day.events}/>
+    return <DayBox key={day.date+"-"+day.month+"-"+day.year} month={day.month} year={day.year} date={day.date} isThisMonth={day.isThisMonth} todaysEvents={day.events} calURL={calURL}/>
 }
 
 
 function Calendar(props) {
 console.log("props in <Calendar/>:",props)
+
+calURL = props.calURL;
 
 const eventInfo = props.eventInfo.filter((event) => {return (props.calURL === event.calendar)});
     console.log("data going into the calendar...",eventInfo);
@@ -19,7 +22,7 @@ const eventInfo = props.eventInfo.filter((event) => {return (props.calURL === ev
 useEffect(() => {
 
     if (eventInfo.length===0) {
-        props.getEvents(props.calURL);
+        props.getEvents(calURL);
         console.log("running initial getEvents from <CALENDAR />...");
     }
  }, []);

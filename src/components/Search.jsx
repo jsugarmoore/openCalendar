@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { getEvents } from "../store/actions/eventActions";
 import { getCalendars, authenticateCalendar } from "../store/actions/calendarActions";
 import Authenticate from './Authenticate';
+import Create from "./Create";
 
 var searchResults = [];
 
@@ -41,6 +42,7 @@ useEffect(() => {
     console.log("search page calendar:",thisCalendar);
 
     const [state,setState] = useState("");
+     const [create,setCreate] = useState(false);
 
     function handleChange(e) {
         setState(e.target.value);
@@ -60,11 +62,15 @@ searchResults = eventInfo.filter((event) => {
         <p>{event.description} </p>
         <p>{event.ageRestriction==="true" ? "21+" : "all ages"}  |  {event.cover} </p>
         <p>keywords... {event.keywords}</p>
+        <p className="timestamp">created on {event.creationDate}</p>
         <hr></hr>
         </div>
         );
     }
 
+    function handleCreate() {
+      setCreate(true);
+    }
 
     return(<>{((authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div className="box">
     <Link to={"/calendar/"+calURL+(thisCalendar===undefined ? "" : (thisCalendar.public===true ? "" : "/private"))}><p className="link">head back to the calendar { thisCalendar === undefined ? "" : "'"+thisCalendar.calName+"'" }...</p></Link>
@@ -77,10 +83,11 @@ searchResults = eventInfo.filter((event) => {
     <h3>{state.length===0 ? "all " : ""}events{state.length>0 ? " matching '"+state+"'" : null}...</h3>
         <div className="resultsBox">{searchResults.map(createSearchResult)}</div> 
     </div>
-    </div></>  : 
-<><Authenticate calURL={calURL} /></>}</>
-        );
-
+    </div></> : 
+<>{((thisCalendar===undefined) ? <><div className="box"><h2 className="homepage">This calendar doesn't exist yet.
+<br/> Why don't you <span onClick={handleCreate} className="link">create it</span>?</h2></div></> : <Authenticate calURL={calURL}/>)}</>
+}{( (create===true) ? <Create history={props.history} calURL={calURL}/> : "")}
+</>);
 }
 
 const mapStateToProps = (state) => {

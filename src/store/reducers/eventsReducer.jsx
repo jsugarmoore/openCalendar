@@ -7,6 +7,7 @@ function eventInfo(state=initState, action) {
     switch(action.type) {
         case 'CREATE_EVENT':
             console.log('created event!', action.event,state);
+            action.event.ageRestriction = action.event.ageRestriction.toString();
             return {
                 events:[...state.events,action.event]
             }
@@ -25,8 +26,8 @@ function eventInfo(state=initState, action) {
                 events:[...stateMinusOldEvent,action.event]
             }
         case 'DELETE_EVENT':
-            console.log('deleted event!',action.eventID,state);
-            const stateMinusDeletedEvent = state.events.filter((event) => {return (event._id !== action.eventID)});
+            console.log('deleted event!',action.editKey,state);
+            const stateMinusDeletedEvent = state.events.filter((event) => {return (event.editKey !== action.editKey)});
             return {
                 events: [...stateMinusDeletedEvent]
             }

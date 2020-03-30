@@ -34,3 +34,9 @@ export const authenticateCalendar = (calURL) => {
         dispatch({type:"AUTHENTICATE_CALENDAR",calURL})
     }
 }
+
+export const setCurrentView = (viewInfo) => {
+    return (dispatch,getState) => {
+        dispatch({type:"SET_CURRENT_VIEW",viewInfo})
+    }
+}

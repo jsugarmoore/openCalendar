@@ -1,9 +1,10 @@
 import React, {useState,useEffect} from "react";
-import { createEvent } from '../store/actions/eventActions';
+import { getEvents,createEvent } from '../store/actions/eventActions';
 import { getCalendars,authenticateCalendar } from '../store/actions/calendarActions';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 import Authenticate from "./Authenticate";
+import Create from "./Create";
 
 function Submit(props) {
 
@@ -22,6 +23,14 @@ function Submit(props) {
     console.log("fetching calendars list within <Submit />...")
 
   },[]);
+
+  useEffect(() => {
+
+    if (props.eventInfo===undefined ? false : props.eventInfo.length === 0) {
+      props.getEvents(calURL);
+      console.log("running initial getEvents from <Submit />...");
+    }
+  }, []);
 
 const thisCalendar = props.calendarList.filter((calendar) => { return (calendar.calURL===calURL) })[0];  
 console.log("props within <Submit />...",props);
@@ -44,15 +53,17 @@ console.log("this calendar is ",calURL,thisCalendar);
     };
 
     const [state,setState] = useState(form);
+    const [create,setCreate] = useState(false);
 
     function handleChange(e){
       console.log(e.target.value);
             if (e.target.id!=="ageRestriction") {
         setState(Object.assign({},state,{[e.target.id]:e.target.value}));
      } else { setState(Object.assign({},state,{ageRestriction:!(state.ageRestriction)})) }
-        console.log(state);
     
      };
+
+      console.log("state in <Submit/> outside of handleChange functions",state);
 
     function handleSubmit(e) {
       e.preventDefault();
@@ -76,6 +87,10 @@ console.log("this calendar is ",calURL,thisCalendar);
       console.log("calURL: ",calURL," & props.private: ",props.private);
       props.createEvent(state);
       props.history.push("/calendar/" + calURL+ ( (props.private) ? "/private" : ""));
+    }
+
+    function handleCreate() {
+      setCreate(true);
     }
         
 
@@ -115,13 +130,16 @@ return(<>{((authorizedCal===calURL) || (thisCalendar===undefined ? false : thisC
   </form>
 </div>
 </div></> : 
-<><Authenticate calURL={calURL} /></>}</>
-);
+<>{((thisCalendar===undefined) ? <><div className="box"><h2 className="homepage">This calendar doesn't exist yet.
+<br/> Why don't you <span onClick={handleCreate} className="link">create it</span>?</h2></div></> : <Authenticate calURL={calURL}/>)}</>
+}{( (create===true) ? <Create history={props.history} calURL={calURL}/> : "")}
+  </>);
 }
 
 
 const mapStateToProps = (state) => {
   return {
+    eventInfo:state.calendarInfo.eventInfo,
     calendarList: state.calendarInfo.calendarList,
     auth: state.calendarInfo.auth
   }
@@ -131,7 +149,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     createEvent: (event) => dispatch(createEvent(event)),
     getCalendars: () => dispatch(getCalendars()),
-    authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL))
+    authenticateCalendar: (calURL) => dispatch(authenticateCalendar(calURL)),
+    getEvents: (calURL) => dispatch(getEvents(calURL))
   }
 }
 
