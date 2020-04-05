@@ -20,9 +20,9 @@ function DayBox(props) {
 
   return (
     <div className="day" style={props.isThisMonth ? null : notThisMonth}>
-        <div className="dayNumber" onClick={handleDayView}>
+        <div className="dayNumberBox" onClick={handleDayView}>
            
-                {props.date}
+               <span className="dayNumber"> {props.date}</span>
             
         </div>
         

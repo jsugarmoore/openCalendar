@@ -24,6 +24,8 @@ function EventButton(props) {
     creationDate:props.creationDate
   }
 
+  const view = props.currentView.view;
+
   const [show, setShow] = useState(false);
   const [edit,setEdit] = useState(false);
   const [editClick, setEditClick] = useState(false);
@@ -83,7 +85,6 @@ function EventButton(props) {
     }
   };
 
-
   return (
     <>
       <Modal scrollable="true" show={show} onHide={handleClose} size="xl">
@@ -132,11 +133,21 @@ function EventButton(props) {
           onClick={handleShow}
           id={"button-" + props._id}
           className="event-button">
-          &#10047;&nbsp;{props.name} @ {props.venue}
+          {(window.outerWidth < 600 && view==="month" ? <>&#9787;</> : 
+          <>{props.name} @ {props.venue} {((view==="day") ? "... from "+props.startTime+" to "+props.endTime
+          +((props.startDate.toString()!==props.endDate.toString()) ? " on "+props.endDate.toDateString() : "")
+            : "")}</>
+            )}
         </div>
       </div>
     </>
   );
+}
+
+const mapStateToProps = (state) => {
+    return {
+        currentView:state.calendarInfo.viewInfo
+    }
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -147,4 +158,4 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 
-export default connect(null, mapDispatchToProps)(EventButton);
+export default connect(mapStateToProps, mapDispatchToProps)(EventButton);

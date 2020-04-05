@@ -1,7 +1,11 @@
 const calendars = [];
 const auth = "";
 const calendarList = [];
-const viewInfo = {view:"month"};
+const now = new Date(); 
+const viewInfo = {month: now.getMonth(),
+            date: now.getDate(),
+            year: now.getFullYear(),
+            view: (window.outerWidth < 600 ? "day" : "month")};
 const initState = { calendars,auth,calendarList,viewInfo }
 
 

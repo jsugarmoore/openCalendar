@@ -42,20 +42,24 @@ var year = now.getFullYear();
 const [date, setDate] = useState("");
 const [monthYear, submitMonthYear] = useState([month,year]);
 const [create, setCreate] = useState(false);
+const [follow,setFollow] = useState(false);
 
 function handleChange(event) {
   setDate(event.target.value);
   }
 
 function reloadCalendar(event) {
-  let newMonthYear = [new Date(date).getMonth(), new Date(date).getFullYear()];
-  console.log("reload calendar with this date", newMonthYear);
-  
+  let newMonthYear = [new Date(date).getMonth(), new Date(date).getFullYear(), new Date(date).getDate()];
+  let isTheFirst = date.slice(0,date.length-5).includes("1");
+  console.log("reload calendar with this date", newMonthYear,date,isTheFirst);
+ 
+
   let viewInfo = {
     calURL: calURL,
     month: newMonthYear[0],
     year: newMonthYear[1],
-    view: "month"
+    date: newMonthYear[2],
+    view: (((newMonthYear[2]!==1) || (newMonthYear[2]===1 && isTheFirst)) ? "day" : "month")
   };
   props.setCurrentView(viewInfo);
   submitMonthYear([new Date(date).getMonth(), new Date(date).getFullYear()]);
@@ -67,9 +71,25 @@ function handleFuture(event) {
   if (currentView.view==="month") {
   if (monthYear[0]===11) {
   submitMonthYear([0, monthYear[1]+1]);
+  let viewInfo = {
+    calURL: calURL,
+    month: 0,
+    date:currentView.date,
+    year: monthYear[1]+1,
+    view: "month"
+  };
+  props.setCurrentView(viewInfo);
   event.preventDefault(); 
 } else {
   submitMonthYear([monthYear[0]+1, monthYear[1]]);
+  let viewInfo = {
+    calURL: calURL,
+    month: monthYear[0]+1,
+    date:currentView.date,
+    year: monthYear[1],
+    view: "month"
+  };
+  props.setCurrentView(viewInfo);
   event.preventDefault();
 } } else if (currentView.view==="day") {
   let today = new Date(currentView.year,currentView.month,currentView.date);
@@ -92,9 +112,25 @@ function handlePast(event) {
   if (currentView.view === "month") {
   if (monthYear[0] === 0) {
      submitMonthYear([11, monthYear[1] - 1]);
+     let viewInfo = {
+      calURL: calURL,
+      month: 11,
+      date:currentView.date,
+      year: monthYear[1]-1,
+      view: "month"
+    };
+    props.setCurrentView(viewInfo);
      event.preventDefault();
    } else {
      submitMonthYear([monthYear[0] - 1, monthYear[1]]);
+     let viewInfo = {
+      calURL: calURL,
+      month: monthYear[0]-1,
+      date:currentView.date,
+      year: monthYear[1],
+      view: "month"
+    };
+    props.setCurrentView(viewInfo);
      event.preventDefault();
    } } else if (currentView.view==="day") {
   let today = new Date(currentView.year,currentView.month,currentView.date);
@@ -121,39 +157,56 @@ function handleCreate() {
 }
 
 function setCalView() {
-  let viewInfo = {calURL:calURL,month:currentView.month,year:currentView.year,view:"month"};
+  let viewInfo = {calURL:calURL,
+    month:currentView.month,
+    year:currentView.year,
+    date:currentView.date,
+    view:((currentView.view==="month") ? "day" : "month")};
   props.setCurrentView(viewInfo);
   submitMonthYear([viewInfo.month, viewInfo.year]);
+}
+
+function handleFollow() {
+  setFollow(!follow);
 }
 
 
     return ( <>{((authorizedCal===calURL) || (thisCalendar===undefined ? false : thisCalendar.public)) ? <><div className="container">
                 <div className="box" id="heading">
-                   <h1> { thisCalendar === undefined ? "" : thisCalendar.calName } </h1>
-                   <h4 className="calSubheader"> { thisCalendar === undefined ? "" : thisCalendar.description } </h4>
+                   <h1> { thisCalendar === undefined ? "" : thisCalendar.calName } <span onClick={handleFollow}>{(follow ? <>&#10030;</> : <>&#10025;</>)}</span></h1>
+                   <h5 className="calSubheader"> { thisCalendar === undefined ? "" : thisCalendar.description } </h5>
                    <p className="timestamp">created on { thisCalendar === undefined ? "" : thisCalendar.creationDate}</p>
-                   <div className="row container iconsBar"><div className="col icons"><Link to={"/calendar/"+calURL+"/"+ ((thisCalendar === undefined) ? "" : (thisCalendar.public ? "" : "private/"))+"submit"}><p className="link">add an event</p></Link></div>
-                   <div className="col icons"><Link to="/"><p className="link">home</p></Link></div>
-                   <div className="col icons"><Link to={"/calendar/"+calURL+"/"+ ((thisCalendar === undefined) ? "" : (thisCalendar.public ? "" : "private/"))+"search"}><p className="link">search for events</p></Link></div>
+                   <div className="row iconsBar"><div className="col"><Link to={"/calendar/"+calURL+"/"+ ((thisCalendar === undefined) ? "" : (thisCalendar.public ? "" : "private/"))+"submit"}><p className="link linkIcon">&#43;</p></Link></div>
+                   <div className="col"><Link to="/"><p className="link linkIcon">&#8962;</p></Link></div>
+                   <div className="col"><Link to={"/calendar/"+calURL+"/"+ ((thisCalendar === undefined) ? "" : (thisCalendar.public ? "" : "private/"))+"search"}><p className="link linkIcon">&#8981;</p></Link></div>
                  </div></div>
 
         <div className="calGroup">
-          <div className="calendar-header row">
+          <div className="calendar-header">
+          <div className="row">
+          <div className="mr-auto">
            <form onSubmit={handlePast}>
            <button type="submit" className="arrow">{(currentView.view==="day" ?  "yesterday" : months[(month+11)%12])}</button> 
            </form>
-           <form onSubmit={reloadCalendar} className="monthSelector">
-              <h2 className="monthYear" onClick={setCalView}>   {(currentView.view==="day") ? days[new Date(currentView.year,currentView.month,currentView.date).getDay()] + " " + months[currentView.month] + " " + currentView.date + ", " + currentView.year : months[month] + " " + year}</h2>
-              <input onChange={handleChange} className="form-control" type="text" name="monthYear" placeholder="type a month and year, and press return..." />
-              <button type="submit"></button>
-            </form>
-            <form onSubmit={handleFuture}>
+           </div>
+           <div className="ml-auto">
+           <form onSubmit={handleFuture}>
             <button type="submit" className="arrow">{(currentView.view==="day" ?  "tomorrow" : months[(month+1)%12])}</button>
             </form>
+            </div>
+            </div>
+            <div>
+          
+              <h2 className="monthYear mr-auto ml-auto" onClick={setCalView}>   {(currentView.view==="day") ? days[new Date(currentView.year,currentView.month,currentView.date).getDay()] + " " + months[currentView.month] + " " + currentView.date + ", " + currentView.year : months[month] + " " + year}</h2>
+              <form onSubmit={reloadCalendar} className="monthSelector mr-auto ml-auto">                      
+              <input onChange={handleChange} className="form-control" type="text" name="monthYear" placeholder= "e.g. 'Apr 20, 1969'..." />
+              <button type="submit"></button>   
+            </form>
+            </div>
           </div>
       </div>
     </div>
-{((currentView.view==="day") ? <CalendarDay date={currentView.date} month={currentView.month} year={currentView.year} calURL={currentView.calURL}/> : <Calendar calURL={calURL} month={month} year={year}/>)} </> : 
+{((currentView.view==="day") ? <CalendarDay date={currentView.date} month={currentView.month} year={currentView.year} calURL={calURL}/> : <Calendar calURL={calURL} month={month} year={year}/>)} </> : 
 <>{((thisCalendar===undefined) ? <><div className="box"><h2 className="homepage">This calendar doesn't exist yet.
 <br/> Why don't you <span onClick={handleCreate} className="link">create it</span>?</h2></div></> : <Authenticate calURL={calURL}/>)}</> 
     }{( (create===true) ? <Create history={props.history} calURL={calURL}/> : "")}
