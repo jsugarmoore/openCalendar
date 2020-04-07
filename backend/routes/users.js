@@ -9,11 +9,11 @@ router.route('/register').post((req, res) => {
     User.register({username:req.body.username},req.body.password, function(err,user) {
         if (err) {
             console.log("ERROR IN REGISTRATION... ",err);
-            res.redirect("/");
+            return;
         } else {
             passport.authenticate("local")(req,res,function(){
                 console.log("********authenticated*******",user);
-                res.redirect("/");
+                return;
              })
             }
     })

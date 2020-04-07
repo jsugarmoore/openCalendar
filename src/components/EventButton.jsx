@@ -3,6 +3,8 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { connect } from 'react-redux';
 import { updateEvent, deleteEvent } from "../store/actions/eventActions";
+// import * as linkify from 'linkifyjs'
+import Linkify from 'linkifyjs/react';
 
 
 function EventButton(props) {
@@ -98,7 +100,7 @@ function EventButton(props) {
           <p>end... {edit===true ?  <><input required type="date" onChange={handleEventEdit} value={eventState.endDate} id="endDate"/> <input required value={eventState.endTime} onChange={handleEventEdit} type="time" id="endTime"/><br/></>
           : <>{props.endDate.toDateString()} at {props.endTime} </>}</p>
           <hr></hr>
-          <p className="modalDescription">{edit===true ?  <>description...  <textarea required id="description" value={eventState.description} rows="4" cols="60" onChange={handleEventEdit}/></> : props.description}</p>
+          <p className="modalDescription">{edit===true ?  <>description...  <textarea required id="description" value={eventState.description} rows="4" cols="60" onChange={handleEventEdit}/></> : <Linkify>{props.description}</Linkify>}</p>
           <p>{edit===true ? <>21+? <input onChange={handleEventEdit} type="checkbox" id="ageRestriction" value={eventState.ageRestriction} checked={eventState.ageRestriction===true ? 1 : 0}/></> : (props.ageRestriction==='true' ? "21+ " : "all ages ")}  
            {edit===true ? <><br/>cover charge? <input required onChange={handleEventEdit} id="cover" value={eventState.cover}/></> : " | "+props.cover} </p>
           <hr></hr>

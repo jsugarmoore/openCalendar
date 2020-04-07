@@ -5,6 +5,8 @@ import { getEvents } from "../store/actions/eventActions";
 import { getCalendars, authenticateCalendar } from "../store/actions/calendarActions";
 import Authenticate from './Authenticate';
 import Create from "./Create";
+// import * as linkify from 'linkifyjs'
+import Linkify from 'linkifyjs/react';
 
 var searchResults = [];
 
@@ -59,7 +61,7 @@ searchResults = eventInfo.filter((event) => {
         <h4>{event.name} @ {event.venue}</h4>
        <p>starts on {event.startDate.toDateString()} at {event.startTime} </p>
           <p>ends on {event.endDate.toDateString()} at {event.endTime} </p>
-        <p>{event.description} </p>
+        <p><Linkify>{event.description}</Linkify> </p>
         <p>{event.ageRestriction==="true" ? "21+" : "all ages"}  |  {event.cover} </p>
         <p>keywords... {event.keywords}</p>
         <p className="timestamp">created on {event.creationDate}</p>

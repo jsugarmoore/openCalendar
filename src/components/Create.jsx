@@ -112,8 +112,8 @@ return(<div>{(newURL===undefined) ?
     <p className="formtext">{(badChar) ? <><span className="urlTaken">no special characters -- only use A-Z,a-z,0-9</span></> : ""}</p>
     <div className="form-group">
       <label htmlFor="public">Is this a public calendar? </label>&nbsp;&nbsp;&nbsp;<input onChange={handlePublicChange} type="checkbox" id="public" /> 
-      <p className="formtext">public calendars are searchable from the homepage by anyone.<br/>
-      private calendar URLs contain a hash, and are not findable without the link.</p>
+      <p className="formtext">public calendars are searchable from the homepage and can be viewed by anyone.<br/>
+      private calendars are accessible only with the correct link and password.</p>
       
     </div>
      <div className="form-group">
