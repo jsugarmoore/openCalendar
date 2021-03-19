@@ -1,5 +1,19 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+This repo contains code for a public calendar/event-sharing app with the following features:
+
+Create public calendars
+Create public events within individual calendars
+Enter details for individual events
+Search calendar repository
+Search for event information within individual calendars
+View a calendar in month, week, or day mode
+Navigate through calendars either chronologically or by typing in month and year
+Click on any event to pull up event details
+Responsive sizing if the app is opened on a computer, tablet, or phone browser
+
+I began researching authentication and sketched out a rough draft front-end of what an authentication-based system might feel like. I moved on to other projects before implementing the back-end.
+
 ## Available Scripts
 
 In the project directory, you can run:
