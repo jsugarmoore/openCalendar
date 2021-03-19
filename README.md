@@ -1,6 +1,6 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-This repo contains code for a public calendar / event-sharing app <br />
+### This repository contains code for a public calendar and event-sharing app
 ![app home page](https://github.com/jsugarmoore/openCalendar/blob/a8118d8637e5bec9fc5fc901473c4eb5af9f21dd/public/Screen%20Shot%202021-03-19%20at%203.28.49%20AM.png "calendar home page")<br />
 
 The app has the following features and capabilities:
